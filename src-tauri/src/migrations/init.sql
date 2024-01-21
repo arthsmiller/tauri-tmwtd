@@ -30,11 +30,7 @@ CREATE TABLE IF NOT EXISTS `tasks` (
     `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     `title` VARCHAR(255) NOT NULL,
     `description` VARCHAR(2048),
-    `priority` INTEGER,
     `estimated_time` INTEGER,
-    `status` VARCHAR(255),
-    FOREIGN KEY (priority) REFERENCES priority(id),
-    FOREIGN KEY (status) REFERENCES status(id)
 );
 
 CREATE TABLE IF NOT EXISTS `tags` (
@@ -43,4 +39,16 @@ CREATE TABLE IF NOT EXISTS `tags` (
     `tag` VARCHAR(255) NOT NULL,
     FOREIGN KEY (task_id) REFERENCES task(id),
     CONSTRAINT UC_Tags_Tasks UNIQUE (tag, task_id)
+);
+
+CREATE TABLE IF NOT EXISTS `queue` (
+    `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    `task_id` INTEGER NOT NULL,
+    `start` DATE NOT NULL,
+    `end` DATE NOT NULL,
+    `status` VARCHAR(255),
+    `priority` INTEGER,
+    FOREIGN KEY (task_id) REFERENCES task(id),
+    FOREIGN KEY (status) REFERENCES status(id)
+    FOREIGN KEY (priority) REFERENCES priority(id),
 );
