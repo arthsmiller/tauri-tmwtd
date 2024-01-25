@@ -3,12 +3,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Task {
-    id: u32,
-    title: String,
-    description: String,
-    priority: Priority,
-    estimated_time: u32,
-    status: TaskStatus,
+    pub id: u32,
+    pub title: String,
+    pub description: String,
 }
 
 impl Task {
@@ -17,9 +14,6 @@ impl Task {
             id,
             title,
             description,
-            priority,
-            estimated_time,
-            status: TaskStatus::NotStarted,
         }
     }
 
@@ -37,30 +31,6 @@ impl Task {
         self.description = description;
     }
 
-    pub fn get_priority(&self) -> &String {
-        &self.title
-    }
-    pub fn set_priority(&mut self, priority: Priority) {
-        self.priority = priority;
-    }
-
-    pub fn get_estimated_time(&self) -> &u32 {
-        &self.estimated_time
-    }
-    pub fn set_estimated_time(&mut self, estimated_time: u32) {
-        self.estimated_time = estimated_time;
-    }
-
-    pub fn get_status(&self) -> &TaskStatus {
-        &self.status
-    }
-    pub fn set_status(&mut self, status: TaskStatus) {
-        self.status = status;
-    }
-
-    pub fn update_status(&mut self, status: TaskStatus) {
-        self.status = status;
-    }
 }
 
 pub struct TaskManager {

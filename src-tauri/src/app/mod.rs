@@ -1,24 +1,16 @@
 use std::error::Error;
 pub use crate::app::task::{Task, TaskManager, TaskStatus};
-pub use crate::app::scheduler::Scheduler;
+pub use crate::app::schedule::Schedule;
 
 mod task;
-mod scheduler;
+mod schedule;
 
 pub struct AppModule {
     task_manager: TaskManager,
-    scheduler: Scheduler,
+    scheduler: Schedule,
 }
 
 impl AppModule {
-    pub fn new() -> AppModule {
-        AppModule {
-            task_manager: TaskManager::new(),
-            scheduler: Scheduler::new(),
-        }
-    }
-
-    // Function to configure the AppModule
     pub fn configure(&mut self) {
         // Configure the Task Manager
         // This might involve setting default parameters, loading settings from a file, etc.
@@ -87,22 +79,4 @@ impl AppModule {
         self.task_manager.list_all_tasks()
     }
 
-    pub fn schedule_tasks(&mut self) -> Result<(), Box<dyn Error>> {
-        let tasks = self.task_manager.list_all_tasks();
-
-        // Schedule the tasks using the Scheduler
-        match self.scheduler.schedule(&tasks) {
-            Ok(scheduled_tasks) => {
-                // Update the tasks in the Task Manager with their scheduled times
-                for task in scheduled_tasks {
-                    self.task_manager.update_task(task)?;
-                }
-                Ok(())
-            },
-            Err(e) => {
-                // If there's an error in scheduling, return the error
-                Err(e)
-            }
-        }
-    }
 }

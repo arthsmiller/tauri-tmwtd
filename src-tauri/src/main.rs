@@ -7,11 +7,15 @@ mod utils;
 mod db;
 mod migrations;
 
+use std::error::Error;
+use std::fmt::Pointer;
 use std::sync::Mutex;
+use serde::{Deserialize, Serialize};
 use tauri::App;
-pub use app::{Scheduler, TaskManager};
+pub use app::{Schedule, TaskManager};
 pub use ui::{ClockView, TaskList};
 pub use utils::{DataUtils, TimeUtils};
+use crate::app::Task;
 use crate::db::get_database_connection;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
@@ -26,6 +30,59 @@ fn update_current_time() -> String {
     current_time.format("%H:%M:%S").to_string()
 }
 
+#[tauri::command]
+fn list_all_tasks(db_conn: tauri::State<Mutex<rusqlite::Connection>>) -> Vec<Task> {
+    let conn = db_conn.lock().unwrap();
+
+    let mut stmt = conn
+        .prepare("SELECT * FROM tasks")
+        .expect("Failed to prepare query.");
+
+    let task_iter = stmt
+        .query_map([], |row| {
+            let id: u32 = row.get(0)?;
+            let title: String = row.get(1)?;
+            let description: String = row.get(2)?;
+
+            Ok(Task {
+                id,
+                title,
+                description,
+            })
+        })
+        .expect("Failed to execute query.");
+
+    let tasks: Vec<Task> = task_iter
+        .filter_map(|task| task.ok())
+        .collect();
+
+    tasks
+}
+
+#[tauri::command]
+fn add_new_task(
+    title: String,
+    description: String,
+    db_conn: tauri::State<Mutex<rusqlite::Connection>>,
+) -> Result<(), String> {
+    let conn = db_conn.lock().unwrap();
+
+    let mut stmt = conn
+        .prepare("INSERT INTO tasks (title, description) VALUES (?, ?)")
+        .expect("Failed to prepare query.");
+
+    let result = stmt.execute(&[&title, &description]);
+
+    match result {
+        Ok(_) => {
+            Ok(())
+        }
+        Err(err) => {
+            Err(format!("Error inserting task: {:?}", err))
+        }
+    }
+}
+
 fn main() {
     let mut conn = get_database_connection();
 
@@ -36,61 +93,10 @@ fn main() {
         .manage(Mutex::new(conn))
         .invoke_handler(tauri::generate_handler![
             greet,
-            update_current_time
+            update_current_time,
+            list_all_tasks,
+            add_new_task
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-
-// fn setup_app_module(app: &App) {
-//     let task_manager = TaskManager::new();
-//     task_manager.configure();
-//
-//     let mut scheduler = Scheduler::new();
-//     scheduler.configure();
-//
-//     let user_manager = UserManager::new();
-//     user_manager.load_or_create_user();
-//
-//     app.register_module(task_manager);
-//     app.register_module(scheduler);
-//     app.register_module(user_manager);
-//
-//     // Additional setup steps can be added here...
-// }
-//
-// fn setup_ui_module(app: &mut App) {
-//     // Initialize ClockView for the analog clock interface
-//     let mut clock_view = ClockView::new();
-//     // Configure and add customizations to the clock view
-//     clock_view.configure();
-//
-//     // Initialize TaskList to display tasks
-//     let mut task_list = TaskList::new();
-//     // Configure task list (like layout, event handlers, etc.)
-//     task_list.configure();
-//
-//     // Register UI components (ClockView, TaskList) with the app
-//     app.register_ui_component(clock_view);
-//     app.register_ui_component(task_list);
-//
-//     // Additional UI setup steps can be added here...
-// }
-//
-// fn setup_utils_module(app: &mut App) {
-//     // Initialize TimeUtils for handling time-related functionalities
-//     let mut time_utils = TimeUtils::new();
-//     // Perform any necessary configuration for TimeUtils
-//     time_utils.configure();
-//
-//     // Initialize DataUtils for data handling tasks
-//     let mut data_utils = DataUtils::new();
-//     // Configure DataUtils (like setting up serialization/deserialization formats)
-//     data_utils.configure();
-//
-//     // Register utility modules (TimeUtils, DataUtils) with the app
-//     app.register_util_module(time_utils);
-//     app.register_util_module(data_utils);
-//
-//     // Additional utility setup steps can be added here...
-// }

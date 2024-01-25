@@ -29,8 +29,7 @@ INSERT INTO status (status) VALUES
 CREATE TABLE IF NOT EXISTS `tasks` (
     `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     `title` VARCHAR(255) NOT NULL,
-    `description` VARCHAR(2048),
-    `estimated_time` INTEGER
+    `description` VARCHAR(2048)
 );
 
 CREATE TABLE IF NOT EXISTS `tags` (

@@ -84,7 +84,7 @@ button {
   outline: none;
 }
 
-#greet-input {
+#greet-input #add-new-task-form{
   margin-right: 5px;
 }
 
