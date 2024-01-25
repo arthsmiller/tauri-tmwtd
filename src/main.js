@@ -1,17 +1,10 @@
 const { invoke } = window.__TAURI__.tauri;
 
-let greetInputEl;
-let greetMsgEl;
 let currentTime;
 let nextTask;
 let allTasks;
 let newTaskTitle;
 let newTaskDescription;
-
-async function greet() {
-  // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-  greetMsgEl.textContent = await invoke("greet", { name: greetInputEl.value });
-}
 
 async function update_current_time() {
   currentTime.textContent = await invoke("update_current_time");
@@ -58,24 +51,15 @@ async function addNewTask() {
   } catch (error) {
     console.log(error);
   }
-
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  greetInputEl = document.querySelector("#greet-input");
-  greetMsgEl = document.querySelector("#greet-msg");
-
   newTaskTitle = document.querySelector("#new-task-title-input");
   newTaskDescription = document.querySelector("#new-task-description-input");
 
   currentTime = document.querySelector("#current-time");
   nextTask = document.querySelector("#next-task");
   allTasks = document.querySelector("#task-list");
-
-  document.querySelector("#greet-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    greet();
-  });
 
   document.querySelector("#add-new-task-form").addEventListener("submit", (e) => {
     e.preventDefault();
