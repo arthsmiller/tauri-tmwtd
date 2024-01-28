@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tauri App</title>
+    <script type="module" src="main.js" defer></script>
+    <style>
+
+    </style>
+</head>
+
+<body>
+<div class="">
+    <p class="site-title">Add new Task to Schedule</p>
+
+    <form>
+        <div class="scheduled-task-container">
+            Create a new task<br>
+            <input type="text" placeholder="Enter a task ..."/>
+        </div>
+
+        <div class="row">
+            or pick an existing one
+        </div>
+        <div class="row">
+            <div class="scheduled-task-container-with-bg">
+                <div class="row">
+                    <input type="checkbox" aria-label="hi">
+                    <label class="add-task-list">a task which needs to be done right now, rly important ...</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                set time <input type="time"> to <input type="time">
+                <button type="submit">Ok</button>
+            </div>
+        </div>
+    </form>
+    <table id="task-table-body"></table>
+</div>
+
+<div class="navbar">
+    <div class="nav-button"><a href="now.html">Now</a></div>
+    <div class="nav-button"><a href="schedule.html">Schedule</a></div>
+    <div class="nav-button"><a>Tasks</a></div>
+    <div class="nav-button"><a>Progress</a></div>
+</div>
+</body>
+</html>
