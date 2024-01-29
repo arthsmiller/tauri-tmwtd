@@ -5,57 +5,9 @@
     <link rel="stylesheet" href="styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tauri App</title>
-    <script type="module" src="/main.js" defer></script>
+    <script type="module" src="main.js" defer></script>
     <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
 
-        .clock-main{
-            font-size: 64px;
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            height: 60px;
-        }
-
-        .nav-button {
-            text-align: center;
-            flex-grow: 1;
-        }
-
-        .timer-time {
-            font-size: 4rem;
-            line-height: 4rem;
-        }
-
-        .timer-button {
-            font-size: 2rem;
-            width: 10rem;
-            height: 5rem;
-            display: inline-block;
-            padding: 10px 20px;
-            margin: 5px;
-            border-radius: 20px;
-            color: white;
-            background-color: #888;
-            cursor: pointer;
-        }
-        .timer-button.abort { background-color: rgba(255, 0, 0, 0.7); }
-        .timer-button.pause { background-color: rgba(255, 127, 0, 0.7); }
-        .timer-button.finish { background-color: rgba(0, 255, 0, 0.7); }
-
-        .row.timer-controlls {
-            padding-top: 4rem;
-        }
     </style>
 </head>
 
@@ -64,17 +16,19 @@
     <div class="current-task-container"><p class="site-title">a task which needs to be done right now, rly important</p></div>
 </div>
 
-<div>
-    <div class="row">
-        <div class="timer-title">time left</div>
-    </div>
-    <div class="row">
-        <div class="timer-time">34:56</div>
-    </div>
-    <div class="row timer-controlls">
-        <button class="timer-button abort">abort</button>
-        <button class="timer-button pause">pause</button>
-        <button class="timer-button finish">finish</button>
+<div class="row">
+    <div class="timer">
+        <div class="row">
+            <div class="timer-title">time left</div>
+        </div>
+        <div class="row">
+            <div class="timer-time">34:56</div>
+        </div>
+        <div class="row timer-controlls">
+            <button class="timer-button abort">abort</button>
+            <button class="timer-button pause">pause</button>
+            <button class="timer-button finish">finish</button>
+        </div>
     </div>
 </div>
 

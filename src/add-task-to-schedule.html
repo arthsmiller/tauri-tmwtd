@@ -16,18 +16,23 @@
     <p class="site-title">Add new Task to Schedule</p>
 
     <form>
-        <div class="scheduled-task-container">
-            Create a new task<br>
-            <input type="text" placeholder="Enter a task ..."/>
+        <div class="row">
+            <div>
+                <div class="scheduled-task-container">
+                    Create a new task<br>
+                    <input type="text" placeholder="Enter a task ..."/>
+                </div>
+            </div>
+        </div>
+
+        <div class="row sub-title">
+            or pick an existing one
         </div>
 
         <div class="row">
-            or pick an existing one
-        </div>
-        <div class="row">
             <div class="scheduled-task-container-with-bg">
                 <div class="row">
-                    <input type="checkbox" aria-label="hi">
+                    <input type="radio" aria-label="hi" name="existing-task">
                     <label class="add-task-list">a task which needs to be done right now, rly important ...</label>
                 </div>
             </div>
@@ -35,7 +40,7 @@
 
         <div class="row">
             <div>
-                set time <input type="time"> to <input type="time">
+                set time <input required type="time"> to <input required type="time">
                 <button type="submit">Ok</button>
             </div>
         </div>
