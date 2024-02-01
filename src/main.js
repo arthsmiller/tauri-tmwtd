@@ -16,7 +16,7 @@ async function show_next_task() {
 
 async function fetchTasks() {
   try {
-    let tasks = await invoke('list_all_tasks');
+    let tasks = await invoke('get_all_tasks');
     console.log(tasks[0]);
 
     renderTable(tasks);

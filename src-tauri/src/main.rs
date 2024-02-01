@@ -1,21 +1,19 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-mod app;
 mod ui;
 mod utils;
 mod db;
 mod migrations;
+mod app;
+
 
 use std::error::Error;
 use std::fmt::Pointer;
 use std::sync::Mutex;
+use chrono::NaiveTime;
 use serde::{Deserialize, Serialize};
-use tauri::App;
-pub use app::{Schedule, TaskManager};
-pub use ui::{ClockView, TaskList};
-pub use utils::{DataUtils, TimeUtils};
-use crate::app::Task;
+use crate::app::{Task, Schedule};
 use crate::db::get_database_connection;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
@@ -31,7 +29,7 @@ fn update_current_time() -> String {
 }
 
 #[tauri::command]
-fn list_all_tasks(db_conn: tauri::State<Mutex<rusqlite::Connection>>) -> Vec<Task> {
+fn get_all_tasks(db_conn: tauri::State<Mutex<rusqlite::Connection>>) -> Vec<Task> {
     let conn = db_conn.lock().unwrap();
 
     let mut stmt = conn
@@ -42,12 +40,10 @@ fn list_all_tasks(db_conn: tauri::State<Mutex<rusqlite::Connection>>) -> Vec<Tas
         .query_map([], |row| {
             let id: u32 = row.get(0)?;
             let title: String = row.get(1)?;
-            let description: String = row.get(2)?;
 
             Ok(Task {
                 id,
                 title,
-                description,
             })
         })
         .expect("Failed to execute query.");
@@ -83,17 +79,91 @@ fn add_new_task(
     }
 }
 
+#[tauri::command]
+fn get_schedule(db_conn: tauri::State<Mutex<rusqlite::Connection>>) -> Vec<Schedule> {
+    let conn = db_conn.lock().unwrap();
+
+    let mut stmt = conn
+        .prepare("SELECT * FROM schedule")
+        .expect("Failed to prepare query.");
+
+    let schedule_iter = stmt
+        .query_map([], |row| {
+            let id: u32 = row.get(0)?;
+            let task_id: u32 = row.get(1)?;
+            let start: NaiveTime = row.get(2)?;
+            let end: NaiveTime = row.get(3)?;
+
+            Ok(Schedule {
+                id,
+                task_id,
+                start,
+                end,
+            })
+        })
+        .expect("Failed to execute query.");
+
+    let schedule: Vec<Schedule> = schedule_iter
+        .filter_map(|schedule: Schedule| schedule.ok())
+        .collect();
+
+    schedule
+}
+
+#[tauri::command]
+pub fn get_current_task (db_conn: tauri::State<Mutex<rusqlite::Connection>>) -> Task {
+    let current_time = chrono::Local::now().format("%H:%M").to_string();
+
+    let conn = db_conn.lock().unwrap();
+
+    let mut stmt = conn
+        .prepare("SELECT * FROM schedule WHERE start < ? AND end > ?")
+        .expect("Failed to prepare query.");
+
+    stmt
+        .query_map(&[&current_time, &current_time], |row| {
+            let id: u32 = row.get(0)?;
+            let title: String = row.get(1)?;
+
+            Ok(Task {
+                id,
+                title,
+            })
+        })
+        .expect("Failed to execute query.")
+}
+
+#[tauri::command]
+pub fn get_time_remaining(db_conn: tauri::State<Mutex<rusqlite::Connection>>) -> String {
+    let current_time = chrono::Local::now().format("%H:%M").to_string();
+
+    let conn = db_conn.lock().unwrap();
+
+    let mut stmt = conn
+        .prepare("SELECT end FROM schedule WHERE start <= ? AND end > ? LIMIT 1")
+        .expect("Failed to prepare query.");
+
+    let result = stmt
+        .query_map(&[&current_time, &current_time], |row| row.get(0))
+        .expect("Failed to execute query.");
+
+    match result.into_iter().next() {
+        Some(Ok(end_time)) => end_time,
+        _ => "No current task found.".to_string(),
+    }
+}
+
+
 /**
 TODO these functions:
-1. load tasks
-2. load schedule
-3. load current task
-4. show current task
-5. countdown current task
-6. schedule task
-7. delete task
-8. delete from schedule
-9. action buttons
+1. ⚠️ load tasks
+2. ⚠️ load schedule
+3. ⚠️ load current task
+4. ⚠️ countdown current task
+5. schedule task
+6. delete task
+7. delete from schedule
+8. action buttons
     a. abort (stop and mark as failed)
     b. finish (stop and mark as success)
     c. pause (move end time (may conflict with the task after, edgecases))
@@ -110,8 +180,9 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             greet,
             update_current_time,
-            list_all_tasks,
-            add_new_task
+            get_all_tasks,
+            add_new_task,
+            // TODO add functions here
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
