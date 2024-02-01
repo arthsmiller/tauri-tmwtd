@@ -83,6 +83,22 @@ fn add_new_task(
     }
 }
 
+/**
+TODO these functions:
+1. load tasks
+2. load schedule
+3. load current task
+4. show current task
+5. countdown current task
+6. schedule task
+7. delete task
+8. delete from schedule
+9. action buttons
+    a. abort (stop and mark as failed)
+    b. finish (stop and mark as success)
+    c. pause (move end time (may conflict with the task after, edgecases))
+*/
+
 fn main() {
     let mut conn = get_database_connection();
 
